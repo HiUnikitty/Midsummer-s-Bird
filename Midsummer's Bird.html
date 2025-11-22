@@ -6385,12 +6385,30 @@ body {
                 let finalContent = content;
 
                 if (type === 'text') {
-                    // 只对AI消息应用regex
+                    // 第一步：替换{{user}}为当前用户名（最先执行）
                     if (!isUser) {
-                        finalContent = applyRegex(content);
-                        // 替换{{user}}为当前用户名
                         const currentUserName = userManagement.getCurrentUser()?.name || '用户';
                         finalContent = finalContent.replace(/\{\{user\}\}/gi, currentUserName);
+                    }
+                    
+                    // 第二步：提取并保护状态栏内容（在正则处理之前）
+                    const statBarPlaceholders = [];
+                    const statBarRegex = /```\s*\n?([\s\S]*?)\n?```/g;
+                    
+                    finalContent = finalContent.replace(statBarRegex, (match, statContent) => {
+                        const trimmedContent = statContent.trim();
+                        // 只保护不包含HTML标签的纯文本状态栏
+                        if (trimmedContent && !/<[^>]+>/.test(trimmedContent)) {
+                            const placeholder = `__STATBAR_${statBarPlaceholders.length}__`;
+                            statBarPlaceholders.push(trimmedContent);
+                            return placeholder;
+                        }
+                        return match; // 保留原样（可能是代码块）
+                    });
+                    
+                    // 第三步：对AI消息应用正则表达式
+                    if (!isUser) {
+                        finalContent = applyRegex(finalContent);
                     }
                     
                     // 处理^^^包裹的HTML内容（对所有消息都应用）
@@ -6398,8 +6416,11 @@ body {
                         return htmlContent;
                     });
                     
-                    // 解析状态栏 (对所有消息都应用)
-                    finalContent = parseStatBar(finalContent);
+                    // 恢复并渲染状态栏（在正则处理之后）
+                    finalContent = finalContent.replace(/__STATBAR_(\d+)__/g, (match, index) => {
+                        const statContent = statBarPlaceholders[parseInt(index)];
+                        return renderStatBar(statContent);
+                    });
 
                     const contentDiv = document.createElement('div');
                     contentDiv.className = 'message-content text-left whitespace-pre-wrap';
