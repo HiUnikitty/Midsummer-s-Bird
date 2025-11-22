@@ -47,6 +47,13 @@
             transition: max-width 0.3s ease;
         }
 
+        /* 移动端聊天框宽度适配 */
+        @media (max-width: 768px) {
+            #app-wrapper main {
+                max-width: 100% !important;
+            }
+        }
+
         .card {
             background-color: var(--card-bg-color);
             border-radius: 12px;
