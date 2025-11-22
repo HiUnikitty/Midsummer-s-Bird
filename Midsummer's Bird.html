@@ -25,6 +25,9 @@
             --bubble-opacity: 0.95;
             --bubble-text-color: #1a1a1d;
             --user-bubble-text-color: #FFFFFF;
+            --chat-width: 60%;
+            --speaking-color: #ff8c42;
+            --star-color: #8e8e93;
         }
 
         body {
@@ -36,6 +39,12 @@
         
         #app-wrapper {
             transition: padding-left 0.3s ease;
+        }
+
+        #app-wrapper main {
+            max-width: var(--chat-width);
+            margin: 0 auto;
+            transition: max-width 0.3s ease;
         }
 
         .card {
@@ -75,6 +84,7 @@
 
         .primary-gradient-text {
             background: linear-gradient(135deg, var(--primary-color), #a3a1d4);
+            background-clip: text;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
@@ -143,7 +153,7 @@
             position: fixed;
             top: 20px;
             right: 20px;
-            background: white;
+            background: var(--card-bg-color);
             border-radius: 8px;
             padding: 16px 20px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.15);
@@ -154,6 +164,7 @@
             transform: translateX(400px);
             transition: transform 0.3s ease;
             border-left: 4px solid #10b981;
+            border: 1px solid var(--border-color);
         }
         .save-toast.show {
             transform: translateX(0);
@@ -485,6 +496,81 @@
             background-color: var(--primary-color);
             color: white;
         }
+        
+        /* Chat Menu Styles */
+        .chat-menu-item {
+            transition: background-color 0.2s ease;
+        }
+        .chat-menu-item:hover {
+            background-color: var(--border-color);
+        }
+        
+        /* Hover Styles - 通用悬停效果 */
+        .hover-bg:hover {
+            background-color: var(--input-bg-color);
+        }
+        
+        .hover-border:hover {
+            border-color: var(--primary-color);
+        }
+        
+        /* 主题边框类 */
+        .theme-border {
+            border-color: var(--border-color);
+        }
+        
+        .theme-border-b {
+            border-bottom-color: var(--border-color);
+        }
+        
+        /* 主题文字颜色类 */
+        .theme-text {
+            color: var(--text-color);
+        }
+        
+        .theme-text-secondary {
+            color: var(--text-secondary-color);
+        }
+        
+        /* Regex颜色类 - 随主题变化 */
+        .speaking-color {
+            color: var(--speaking-color);
+        }
+        
+        .star-color {
+            color: var(--star-color);
+        }
+        
+        /* 主题背景类 - 用于信息框 */
+        .theme-info-bg {
+            background-color: var(--input-bg-color);
+            border-color: var(--border-color);
+        }
+        
+        .theme-info-text {
+            color: var(--primary-color);
+        }
+        
+        /* 状态栏模态框样式 */
+        .stat-bar-container {
+            background: linear-gradient(135deg, rgba(94, 91, 157, 0.1) 0%, rgba(94, 91, 157, 0.05) 100%);
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            padding: 16px;
+            margin: 12px 0;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            line-height: 1.6;
+            font-family: 'KaiTi', '楷体', 'STKaiti', 'BiauKai', serif;
+            color: var(--text-color);
+            white-space: pre-wrap;
+        }
+        
+        .stat-bar-container .stat-non-chinese {
+            font-weight: bold;
+            color: #3498db;
+        }
+        
         .color-input {
             width: 40px;
             height: 40px;
@@ -594,7 +680,7 @@
 <body>
 
     <aside id="sidebar" class="sidebar collapsed">
-        <div class="flex items-center justify-between p-4 h-16 border-b border-gray-200 flex-shrink-0">
+        <div class="flex items-center justify-between p-4 h-16 border-b theme-border-b flex-shrink-0">
             <h1 class="text-lg font-bold primary-gradient-text whitespace-nowrap overflow-hidden">
                 <span>midsummer's bird</span>
             </h1>
@@ -614,7 +700,7 @@
     <div id="app-wrapper">
         <main class="min-h-screen">
             <div class="card flex flex-col h-screen">
-                <header class="flex items-center justify-between p-4 border-b border-gray-200 flex-shrink-0">
+                <header class="flex items-center justify-between p-4 border-b theme-border-b flex-shrink-0">
                     <div class="flex items-center gap-3">
                          <button id="mobile-sidebar-toggle" class="p-2 -ml-2 text-gray-500 hover:text-primary-color">
                             <i class="fas fa-bars text-xl"></i>
@@ -628,7 +714,7 @@
                 </header>
                 <div id="chat-messages" class="flex-1 p-4 overflow-y-auto space-y-4">
                     </div>
-                <footer class="p-4 border-t border-gray-200 flex-shrink-0">
+                <footer class="p-4 border-t theme-border flex-shrink-0">
                      <div id="reply-status-container"></div>
                     <div class="flex items-center gap-2">
                         <!-- 左侧菜单按钮 -->
@@ -637,38 +723,38 @@
                                 <i class="fas fa-plus text-lg"></i>
                             </button>
                             <!-- 弹出菜单 -->
-                            <div id="chat-menu-panel" class="hidden absolute bottom-12 left-0 bg-white border border-gray-200 rounded-lg shadow-lg p-2 min-w-[180px]">
-                                <button class="w-full flex items-center gap-3 px-3 py-2 rounded hover:bg-gray-100 text-left" id="menu-view-prompt-btn">
+                            <div id="chat-menu-panel" class="hidden absolute bottom-12 left-0 border rounded-lg shadow-lg p-2 min-w-[180px]" style="background-color: var(--input-bg-color); border-color: var(--border-color);">
+                                <button class="chat-menu-item w-full flex items-center gap-3 px-3 py-2 rounded text-left" id="menu-view-prompt-btn">
                                     <i class="fas fa-eye text-purple-500"></i>
                                     <span data-i18n="chat.viewPrompt">查看提示词</span>
                                 </button>
-                                <button class="w-full flex items-center gap-3 px-3 py-2 rounded hover:bg-gray-100 text-left" id="menu-new-chat-btn">
+                                <button class="chat-menu-item w-full flex items-center gap-3 px-3 py-2 rounded text-left" id="menu-new-chat-btn">
                                     <i class="fas fa-sync-alt text-green-500"></i>
                                     <span data-i18n="chat.newChat">新对话</span>
                                 </button>
-                                <button class="w-full flex items-center gap-3 px-3 py-2 rounded hover:bg-gray-100 text-left" id="menu-image-btn">
+                                <button class="chat-menu-item w-full flex items-center gap-3 px-3 py-2 rounded text-left" id="menu-image-btn">
                                     <i class="fas fa-image text-blue-500"></i>
                                     <span data-i18n="chat.sendImage">发送图片</span>
                                 </button>
-                                <div class="border-t border-gray-200 my-1"></div>
-                                <button class="w-full flex items-center gap-3 px-3 py-2 rounded hover:bg-gray-100 text-left" id="menu-summarize-btn">
+                                <div class="border-t my-1" style="border-color: var(--border-color);"></div>
+                                <button class="chat-menu-item w-full flex items-center gap-3 px-3 py-2 rounded text-left" id="menu-summarize-btn">
                                     <i class="fas fa-compress-alt text-purple-500"></i>
                                     <span data-i18n="chat.summarize">总结聊天</span>
                                 </button>
-                                <div class="border-t border-gray-200 my-1"></div>
-                                <button class="w-full flex items-center gap-3 px-3 py-2 rounded hover:bg-gray-100 text-left" id="menu-export-config-btn">
+                                <div class="border-t my-1" style="border-color: var(--border-color);"></div>
+                                <button class="chat-menu-item w-full flex items-center gap-3 px-3 py-2 rounded text-left" id="menu-export-config-btn">
                                     <i class="fas fa-download text-orange-500"></i>
                                     <span data-i18n="chat.exportConfig">导出配置</span>
                                 </button>
-                                <button class="w-full flex items-center gap-3 px-3 py-2 rounded hover:bg-gray-100 text-left" id="menu-import-config-btn">
+                                <button class="chat-menu-item w-full flex items-center gap-3 px-3 py-2 rounded text-left" id="menu-import-config-btn">
                                     <i class="fas fa-upload text-orange-500"></i>
                                     <span data-i18n="chat.importConfig">导入配置</span>
                                 </button>
-                                <button class="w-full flex items-center gap-3 px-3 py-2 rounded hover:bg-gray-100 text-left" id="menu-export-chat-btn">
+                                <button class="chat-menu-item w-full flex items-center gap-3 px-3 py-2 rounded text-left" id="menu-export-chat-btn">
                                     <i class="fas fa-file-download text-indigo-500"></i>
                                     <span data-i18n="chat.exportChat">导出聊天记录</span>
                                 </button>
-                                <button class="w-full flex items-center gap-3 px-3 py-2 rounded hover:bg-gray-100 text-left" id="menu-import-chat-btn">
+                                <button class="chat-menu-item w-full flex items-center gap-3 px-3 py-2 rounded text-left" id="menu-import-chat-btn">
                                     <i class="fas fa-file-upload text-indigo-500"></i>
                                     <span data-i18n="chat.importChat">导入聊天记录</span>
                                 </button>
@@ -823,7 +909,7 @@
                 <button class="close-modal-btn text-gray-400 hover:text-gray-800"><i class="fas fa-times text-xl"></i></button>
             </div>
             <div class="space-y-4 overflow-y-auto pr-4 -mr-4">
-                <div class="p-4 rounded-lg border border-gray-200">
+                <div class="p-4 rounded-lg border theme-border">
                     <label class="block text-sm font-medium mb-2" data-i18n="api.configManage">API 配置管理</label>
                     <div class="flex gap-2">
                         <select id="savedApiSelect" class="flex-1 light-input rounded-md p-2"></select>
@@ -867,7 +953,7 @@
                 </div>
                 <div id="api-test-result" class="text-sm mt-2 text-center h-auto min-h-[1rem]"></div>
 
-                <hr class="my-4 border-gray-200">
+                <hr class="my-4 theme-border">
                 <h3 class="text-lg font-semibold primary-gradient-text" data-i18n="api.visionTitle">🖼️ 识图 API 设置 (可选)</h3>
                 <p class="text-xs text-gray-500 mb-3" data-i18n="api.visionDescription">用于发送图片时让AI能够理解图片内容。</p>
 
@@ -909,7 +995,7 @@
         <div class="modal-content w-full h-full card p-6 rounded-2xl flex flex-col">
             <div class="flex justify-between items-center mb-4 flex-shrink-0"><h2 class="text-2xl font-bold primary-gradient-text" data-i18n="presets.title">AI 预设</h2><button class="close-modal-btn text-gray-400 hover:text-gray-800"><i class="fas fa-times text-xl"></i></button></div>
             <div class="flex flex-1 flex-col gap-6 overflow-hidden">
-                <div class="w-full flex flex-col border-b border-gray-200 pb-4">
+                <div class="w-full flex flex-col border-b theme-border-b pb-4">
                     <div class="flex gap-2 mb-4"><button class="flex-1 py-2 text-sm btn-secondary rounded" onclick="document.getElementById('preset-import-json').click()" data-i18n="presets.import">导入</button><input type="file" id="preset-import-json" accept=".json" class="hidden"><button id="preset-export-json" class="flex-1 py-2 text-sm btn-secondary rounded" data-i18n="presets.export">导出</button></div>
                     <div id="preset-list" class="flex-1 overflow-y-auto space-y-2 pr-2"></div>
                     <div class="mt-4"><button id="save-as-preset-btn" class="w-full py-2 btn-primary rounded-lg" data-i18n="presets.saveAsNew">另存为新预设</button></div>
@@ -918,7 +1004,7 @@
                     <div id="preset-editor" class="w-full overflow-y-auto pr-2 space-y-4">
                         <div class="flex justify-between items-center">
                             <h3 class="font-bold text-lg mb-2" data-i18n="presets.samplingParams">采样参数</h3>
-                            <div class="text-sm text-gray-600">
+                            <div class="text-sm theme-text-secondary">
                                 <i class="fas fa-calculator mr-1"></i>
                                 <span data-i18n="presets.estimatedTokens">预估Token:</span> <span id="preset-token-estimate" class="font-bold text-primary-color">0</span>
                             </div>
@@ -929,7 +1015,7 @@
                         <div class="grid grid-cols-5 gap-4 items-center"><label class="text-sm col-span-2">Frequency Penalty</label><div class="col-span-3 flex items-center gap-2"><input type="range" id="param-freq-pen" min="-2" max="2" step="0.01"><input type="number" id="param-freq-pen-value" min="-2" max="2" step="0.01" class="w-20 rounded-md p-1 text-center light-input"></div></div>
                         <div class="grid grid-cols-5 gap-4 items-center"><label class="text-sm col-span-2">Presence Penalty</label><div class="col-span-3 flex items-center gap-2"><input type="range" id="param-pres-pen" min="-2" max="2" step="0.01"><input type="number" id="param-pres-pen-value" min="-2" max="2" step="0.01" class="w-20 rounded-md p-1 text-center light-input"></div></div>
                         <div class="grid grid-cols-5 gap-4 items-center"><label class="text-sm col-span-2">Repetition Penalty</label><div class="col-span-3 flex items-center gap-2"><input type="range" id="param-rep-pen" min="0" max="2" step="0.01"><input type="number" id="param-rep-pen-value" min="0" max="2" step="0.01" class="w-20 rounded-md p-1 text-center light-input"></div></div>
-                        <hr class="border-gray-200">
+                        <hr class="theme-border">
                         <div class="grid grid-cols-5 gap-4 items-center">
                             <label class="text-sm col-span-2">Max Response Tokens</label>
                             <input type="number" id="param-max-tokens" min="1" max="8192" step="1" class="light-input rounded-md p-1 col-span-3">
@@ -938,7 +1024,7 @@
                             <label class="text-sm col-span-2">Context Size (Tokens)</label>
                             <input type="number" id="param-context-size" min="1" max="32768" step="1" class="light-input rounded-md p-1 col-span-3">
                         </div>
-                        <div class="p-3 bg-gray-100 rounded-lg text-xs text-gray-600">
+                        <div class="p-3 theme-info-bg rounded-lg text-xs theme-text-secondary">
                             <div class="flex justify-between mb-1">
                                 <span data-i18n="presets.remainingContext">剩余上下文：</span>
                                 <span id="remaining-context" class="font-bold">0</span>
@@ -948,7 +1034,7 @@
                             </div>
                         </div>
                     </div>
-                    <div id="prompt-editor" class="w-full flex flex-col overflow-hidden border-gray-200">
+                    <div id="prompt-editor" class="w-full flex flex-col overflow-hidden theme-border">
                         <div class="flex justify-between items-center mb-2 flex-shrink-0">
                              <h3 class="font-bold text-lg" data-i18n="presets.promptEntries">提示词条目</h3>
                              <div class="flex items-center gap-2">
@@ -964,21 +1050,21 @@
     </div>
     <div id="character-modal" class="modal-overlay">
         <div class="modal-content w-full h-full card p-0 flex flex-col">
-            <header class="flex justify-between items-center p-4 border-b border-gray-200 flex-shrink-0">
+            <header class="flex justify-between items-center p-4 border-b theme-border-b flex-shrink-0">
                 <h2 class="text-2xl font-bold primary-gradient-text flex items-center gap-3"><i class="fas fa-user-astronaut"></i><span data-i18n="char.title">角色管理</span></h2>
                 <button class="close-modal-btn text-gray-400 hover:text-gray-800"><i class="fas fa-times text-xl"></i></button>
             </header>
             <div class="flex-1 flex flex-col gap-0 overflow-hidden">
                 <!-- 角色选择区域 -->
-                <div class="p-4 space-y-3 flex-shrink-0 border-b border-gray-200">
+                <div class="p-4 space-y-3 flex-shrink-0 border-b theme-border-b">
                     <label class="block text-sm font-medium" data-i18n="char.current">当前角色</label>
 
                     <!-- 角色预览卡片（点击打开弹窗） -->
-                    <div id="char-preview-card" class="p-3 rounded-lg border-2 border-gray-200 hover:border-primary-color cursor-pointer transition-all bg-white">
+                    <div id="char-preview-card" class="p-3 rounded-lg border-2 theme-border hover:border-primary-color cursor-pointer transition-all bg-white">
                         <div class="flex items-center gap-3">
                             <img id="current-char-avatar-preview" src="https://placehold.co/48x48/5E5B9D/ffffff?text=AI" class="w-12 h-12 rounded-full object-cover border-2 border-primary-color">
                             <div class="flex-1">
-                                <p id="current-char-name-preview" class="font-bold text-lg" data-i18n="char.noSelect">未选择角色</p>
+                                <p id="current-char-name-preview" class="font-bold text-lg text-black" data-i18n="char.noSelect">未选择角色</p>
                                 <p class="text-sm text-gray-500" data-i18n="char.clickSelect">点击选择或创建角色</p>
                             </div>
                             <i class="fas fa-chevron-down text-gray-400"></i>
@@ -1067,15 +1153,15 @@
     </div>
     <div id="world-info-modal" class="modal-overlay">
         <div class="modal-content w-full h-full card p-0 flex flex-col">
-            <header class="flex justify-between items-center p-4 border-b border-gray-200 flex-shrink-0">
+            <header class="flex justify-between items-center p-4 border-b theme-border-b flex-shrink-0">
                 <h2 class="text-2xl font-bold primary-gradient-text flex items-center gap-3">
                     <i class="fas fa-book"></i><span data-i18n="worldInfo.title">世界书</span>
                 </h2>
                 <button class="close-modal-btn text-gray-400 hover:text-gray-800"><i class="fas fa-times text-xl"></i></button>
             </header>
             <div class="flex-1 flex flex-col overflow-hidden">
-                <div class="w-full flex flex-col border-b border-gray-200">
-                    <div class="p-3 space-y-2 flex-shrink-0 border-b border-gray-200">
+                <div class="w-full flex flex-col border-b theme-border-b">
+                    <div class="p-3 space-y-2 flex-shrink-0 border-b theme-border-b">
                         <label class="block text-sm font-medium" data-i18n="worldInfo.select">选择世界书</label>
                         <select id="wi-world-select" class="w-full light-input rounded-md p-2"></select>
                          <div class="grid grid-cols-2 gap-2">
@@ -1160,7 +1246,7 @@
     </div>
     <div id="regex-modal" class="modal-overlay">
         <div class="modal-content w-full h-full card p-0 flex flex-col">
-            <header class="flex justify-between items-center p-4 border-b border-gray-200 flex-shrink-0">
+            <header class="flex justify-between items-center p-4 border-b theme-border-b flex-shrink-0">
                 <h2 class="text-2xl font-bold primary-gradient-text flex items-center gap-3">
                     <i class="fas fa-code"></i><span data-i18n="regex.title">正则表达式</span>
                 </h2>
@@ -1198,7 +1284,7 @@
     </div>
     <div id="user-profile-modal" class="modal-overlay">
         <div class="modal-content w-full h-full card p-0 flex flex-col">
-            <header class="flex justify-between items-center p-4 border-b border-gray-200 flex-shrink-0">
+            <header class="flex justify-between items-center p-4 border-b theme-border-b flex-shrink-0">
                 <h2 class="text-2xl font-bold primary-gradient-text flex items-center gap-3">
                     <i class="fas fa-users"></i><span data-i18n="user.title">用户管理</span>
                 </h2>
@@ -1207,15 +1293,15 @@
 
             <div class="flex-1 flex flex-col gap-0 overflow-hidden">
                 <!-- 用户选择区域 -->
-                <div class="p-4 space-y-3 flex-shrink-0 border-b border-gray-200">
+                <div class="p-4 space-y-3 flex-shrink-0 border-b theme-border-b">
                     <label class="block text-sm font-medium" data-i18n="user.currentUser">当前用户</label>
 
                     <!-- 用户预览卡片（点击打开弹窗） -->
-                    <div id="user-preview-card" class="p-3 rounded-lg border-2 border-gray-200 hover:border-primary-color cursor-pointer transition-all bg-white">
+                    <div id="user-preview-card" class="p-3 rounded-lg border-2 theme-border hover:border-primary-color cursor-pointer transition-all" style="background-color: var(--card-bg-color);">
                         <div class="flex items-center gap-3">
                             <img id="current-user-avatar-preview" src="https://placehold.co/48x48/E4E6EB/1A1A1D?text=U" class="w-12 h-12 rounded-full object-cover border-2 border-primary-color">
                             <div class="flex-1">
-                                <p id="current-user-name-preview" class="font-bold text-lg">默认用户</p>
+                                <p id="current-user-name-preview" class="font-bold text-lg text-black">默认用户</p>
                                 <p id="current-user-status-preview" class="text-sm text-gray-500">在线</p>
                             </div>
                             <i class="fas fa-chevron-down text-gray-400"></i>
@@ -1385,8 +1471,8 @@
         <div class="modal-content w-full card p-6 text-center">
             <h3 class="text-xl font-bold mb-4" data-i18n="regexImport.title">导入至:</h3>
             <div class="space-y-3 mb-6">
-                <label class="block p-4 rounded-lg border cursor-pointer hover:bg-gray-50"><input type="radio" name="import-location" value="global" class="mr-2" checked><span data-i18n="regexImport.global">全局正则脚本</span></label>
-                <label class="block p-4 rounded-lg border cursor-pointer hover:bg-gray-50"><input type="radio" name="import-location" value="local" class="mr-2"><span data-i18n="regexImport.local">局部正则脚本</span></label>
+                <label class="block p-4 rounded-lg border cursor-pointer hover-bg" style="background-color: var(--card-bg-color);"><input type="radio" name="import-location" value="global" class="mr-2" checked><span data-i18n="regexImport.global">全局正则脚本</span></label>
+                <label class="block p-4 rounded-lg border cursor-pointer hover-bg" style="background-color: var(--card-bg-color);"><input type="radio" name="import-location" value="local" class="mr-2"><span data-i18n="regexImport.local">局部正则脚本</span></label>
             </div>
             <div class="flex gap-4">
                 <button id="confirm-regex-import-btn" class="flex-1 py-2 btn-primary rounded-lg" data-i18n="regexImport.confirm">确认</button>
@@ -1494,7 +1580,7 @@
             </div>
 
             <!-- 标签页 -->
-            <div class="flex flex-wrap gap-2 mb-4 border-b border-gray-200 pb-2">
+            <div class="flex flex-wrap gap-2 mb-4 border-b theme-border-b pb-2">
                 <button id="theme-tab-presets" class="px-3 py-2 border-b-2 border-primary-color font-medium text-sm whitespace-nowrap" onclick="switchThemeTab('presets')" data-i18n="theme.tabPresets">预设主题</button>
                 <button id="theme-tab-custom" class="px-3 py-2 text-gray-500 text-sm whitespace-nowrap" onclick="switchThemeTab('custom')" data-i18n="theme.tabCustom">自定义CSS</button>
                 <button id="theme-tab-saved" class="px-3 py-2 text-gray-500 text-sm whitespace-nowrap" onclick="switchThemeTab('saved')" data-i18n="theme.tabSaved">保存的主题</button>
@@ -1507,6 +1593,7 @@
                         <label class="block text-sm font-medium mb-2" data-i18n="theme.presetThemes">预设主题</label>
                         <div class="grid grid-cols-2 gap-3">
                             <button class="theme-preset-btn p-3 rounded-lg text-sm" data-theme="default" data-i18n="theme.default">默认</button>
+                            <button class="theme-preset-btn p-3 rounded-lg text-sm" data-theme="light" data-i18n="theme.light">浅色</button>
                             <button class="theme-preset-btn p-3 rounded-lg text-sm" data-theme="dark" data-i18n="theme.dark">暗黑</button>
                             <button class="theme-preset-btn p-3 rounded-lg text-sm" data-theme="blue" data-i18n="theme.blue">海洋</button>
                             <button class="theme-preset-btn p-3 rounded-lg text-sm" data-theme="green" data-i18n="theme.green">森林</button>
@@ -1574,6 +1661,55 @@
                                     <input type="text" id="inputBgColorText" class="w-full light-input rounded-md p-1 text-sm font-mono">
                                 </div>
                             </div>
+                            <div>
+                                <label class="text-sm block mb-1" data-i18n="theme.textSecondary">次要文字</label>
+                                <div class="flex items-center gap-2">
+                                    <input type="color" id="textSecondaryColorInput" class="color-input">
+                                    <input type="text" id="textSecondaryColorText" class="w-full light-input rounded-md p-1 text-sm font-mono">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="text-sm block mb-1" data-i18n="theme.primaryHover">主色调悬停</label>
+                                <div class="flex items-center gap-2">
+                                    <input type="color" id="primaryHoverColorInput" class="color-input">
+                                    <input type="text" id="primaryHoverColorText" class="w-full light-input rounded-md p-1 text-sm font-mono">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="text-sm block mb-1" data-i18n="theme.bubbleText">气泡文字</label>
+                                <div class="flex items-center gap-2">
+                                    <input type="color" id="bubbleTextColorInput" class="color-input">
+                                    <input type="text" id="bubbleTextColorText" class="w-full light-input rounded-md p-1 text-sm font-mono">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="text-sm block mb-1" data-i18n="theme.userBubbleText">用户气泡文字</label>
+                                <div class="flex items-center gap-2">
+                                    <input type="color" id="userBubbleTextColorInput" class="color-input">
+                                    <input type="text" id="userBubbleTextColorText" class="w-full light-input rounded-md p-1 text-sm font-mono">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="text-sm block mb-1" data-i18n="theme.speakingColor">话语颜色</label>
+                                <div class="flex items-center gap-2">
+                                    <input type="color" id="speakingColorInput" class="color-input">
+                                    <input type="text" id="speakingColorText" class="w-full light-input rounded-md p-1 text-sm font-mono">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="text-sm block mb-1" data-i18n="theme.starColor">星号颜色</label>
+                                <div class="flex items-center gap-2">
+                                    <input type="color" id="starColorInput" class="color-input">
+                                    <input type="text" id="starColorText" class="w-full light-input rounded-md p-1 text-sm font-mono">
+                                </div>
+                            </div>
+                                                        <div>
+                                <label class="text-sm block mb-1" data-i18n="theme.bubbleOpacity">气泡不透明度</label>
+                                <div class="flex items-center gap-2">
+                                    <input type="range" id="bubbleOpacityInput" min="0" max="1" step="0.05" class="flex-1">
+                                    <input type="text" id="bubbleOpacityText" class="w-20 light-input rounded-md p-1 text-sm font-mono">
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -1612,8 +1748,8 @@ body {
 
                     <div class="setting-group">
                         <label class="block text-sm font-medium mb-2" data-i18n="theme.cssVarsRef">CSS变量参考</label>
-                        <div class="bg-gray-100 p-3 rounded-lg max-h-48 overflow-y-auto">
-                            <pre class="text-xs font-mono">--bg-color: 背景颜色
+                        <div class="bg-gray-900 p-3 rounded-lg max-h-48 overflow-y-auto">
+                            <pre class="text-xs font-mono text-gray-100">--bg-color: 背景颜色
 --card-bg-color: 卡片背景
 --text-color: 文字颜色
 --text-secondary-color: 次要文字颜色
@@ -1625,7 +1761,9 @@ body {
 --ai-bubble-color: AI气泡颜色
 --bubble-opacity: 气泡透明度
 --bubble-text-color: 气泡文字颜色
---user-bubble-text-color: 用户气泡文字颜色</pre>
+--user-bubble-text-color: 用户气泡文字颜色
+--speaking-color: 话语颜色（"对话"）
+--star-color: 星号颜色（*动作*）</pre>
                         </div>
                     </div>
                 </div>
@@ -1700,6 +1838,44 @@ body {
                         <label class="flex items-center gap-2 cursor-pointer">
                             <input type="checkbox" id="user-show-typing-pref" class="w-4 h-4 accent-primary-color">
                             <span class="text-sm" data-i18n="preferences.showTyping">显示打字状态</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- 界面布局设置 -->
+                <div class="card p-4">
+                    <h3 class="font-medium mb-3" data-i18n="preferences.layout">界面布局</h3>
+                    <div class="space-y-3">
+                        <div>
+                            <label class="block text-sm font-medium mb-2">
+                                <span data-i18n="preferences.chatWidth">聊天框宽度</span>
+                                <span id="chat-width-value" class="text-primary-color ml-2">60%</span>
+                            </label>
+                            <input type="range" id="chat-width-slider" min="40" max="100" value="60" step="5" class="w-full">
+                            <div class="flex justify-between text-xs text-gray-500 mt-1">
+                                <span>40%</span>
+                                <span>70%</span>
+                                <span>100%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 开发者模式 -->
+                <div class="card p-4">
+                    <h3 class="font-medium mb-3" data-i18n="preferences.developer">开发者模式</h3>
+                    <div class="space-y-3">
+                        <label class="flex items-center gap-2 cursor-pointer">
+                            <input type="checkbox" id="dev-show-prompts" class="w-4 h-4 accent-primary-color">
+                            <span class="text-sm" data-i18n="preferences.showPrompts">显示完整提示词到控制台</span>
+                        </label>
+                        <label class="flex items-center gap-2 cursor-pointer">
+                            <input type="checkbox" id="dev-show-worldbook-logs" class="w-4 h-4 accent-primary-color">
+                            <span class="text-sm" data-i18n="preferences.showWorldbookLogs">显示世界书日志</span>
+                        </label>
+                        <label class="flex items-center gap-2 cursor-pointer">
+                            <input type="checkbox" id="dev-show-other-logs" class="w-4 h-4 accent-primary-color">
+                            <span class="text-sm" data-i18n="preferences.showOtherLogs">显示其他日志</span>
                         </label>
                     </div>
                 </div>
@@ -1903,8 +2079,8 @@ body {
             </div>
 
             <!-- 提示词检查清单 -->
-            <div class="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                <h3 class="font-bold text-sm mb-2 text-blue-800" data-i18n="prompt.checkTitle">✅ 提示词包含项检查：</h3>
+            <div class="mb-4 p-3 theme-info-bg border rounded-lg">
+                <h3 class="font-bold text-sm mb-2 theme-info-text" data-i18n="prompt.checkTitle">✅ 提示词包含项检查：</h3>
                 <div class="grid grid-cols-2 gap-2 text-sm">
                     <div id="check-system-prompt" class="flex items-center gap-1">
                         <i class="fas fa-check-circle text-green-500"></i>
@@ -1933,7 +2109,7 @@ body {
                 </div>
             </div>
 
-            <div class="flex items-center gap-3 mb-4 p-3 bg-gray-100 rounded-lg flex-wrap">
+            <div class="flex items-center gap-3 mb-4 p-3 theme-info-bg rounded-lg flex-wrap">
                 <div class="flex-1 flex flex-wrap gap-x-4 gap-y-2 text-sm min-w-0">
                     <div class="flex items-center gap-1 whitespace-nowrap">
                         <span class="font-medium text-xs" data-i18n="prompt.totalTokens">总Token数：</span>
@@ -1941,15 +2117,15 @@ body {
                     </div>
                     <div class="flex items-center gap-1 whitespace-nowrap">
                         <span class="font-medium text-xs" data-i18n="prompt.systemTokens">系统提示：</span>
-                        <span id="system-tokens" class="text-blue-600">0</span>
+                        <span id="system-tokens" class="theme-text font-semibold">0</span>
                     </div>
                     <div class="flex items-center gap-1 whitespace-nowrap">
                         <span class="font-medium text-xs" data-i18n="prompt.chatTokens">聊天历史：</span>
-                        <span id="chat-tokens" class="text-green-600">0</span>
+                        <span id="chat-tokens" class="theme-text font-semibold">0</span>
                     </div>
                     <div class="flex items-center gap-1 whitespace-nowrap">
                         <span class="font-medium text-xs" data-i18n="prompt.worldTokens">世界书：</span>
-                        <span id="world-tokens" class="text-purple-600">0</span>
+                        <span id="world-tokens" class="theme-text font-semibold">0</span>
                     </div>
                 </div>
                 <button id="copy-prompt-btn" class="btn-secondary px-4 py-2 rounded-lg text-sm whitespace-nowrap flex-shrink-0">
@@ -2106,9 +2282,8 @@ body {
                     'theme.tabCustom': '自定义CSS',
                     'theme.tabSaved': '保存的主题',
                     'theme.presetThemes': '预设主题',
-                    'theme.customCSS': '自定义CSS',
-                    'theme.savedThemes': '保存的主题',
                     'theme.default': '默认',
+                    'theme.light': '浅色',
                     'theme.dark': '暗黑',
                     'theme.blue': '海洋',
                     'theme.ocean': '海洋',
@@ -2128,8 +2303,13 @@ body {
                     'theme.text': '文字颜色',
                     'theme.border': '边框颜色',
                     'theme.inputBg': '输入框背景',
-                    'theme.textSecondary': '次要文字颜色',
+                    'theme.textSecondary': '次要文字',
                     'theme.primaryHover': '主色调悬停',
+                    'theme.bubbleText': '气泡文字',
+                    'theme.userBubbleText': '用户气泡文字',
+                    'theme.bubbleOpacity': '气泡不透明度',
+                    'theme.speakingColor': '话语颜色',
+                    'theme.starColor': '星号颜色',
                     'theme.format': '格式化',
                     'theme.minify': '压缩',
                     'theme.preview': '预览',
@@ -2194,6 +2374,12 @@ body {
                     'preferences.behavior': '用户行为',
                     'preferences.autoAnnounce': '自动发送用户描述',
                     'preferences.showTyping': '显示打字状态',
+                    'preferences.layout': '界面布局',
+                    'preferences.chatWidth': '聊天框宽度',
+                    'preferences.developer': '开发者模式',
+                    'preferences.showPrompts': '显示完整提示词到控制台',
+                    'preferences.showWorldbookLogs': '显示世界书日志',
+                    'preferences.showOtherLogs': '显示其他日志',
                     'preferences.save': '保存设置',
 
                     // 总结聊天
@@ -2476,9 +2662,8 @@ body {
                     'theme.tabCustom': 'Custom CSS',
                     'theme.tabSaved': 'Saved',
                     'theme.presetThemes': 'Preset Themes',
-                    'theme.customCSS': 'Custom CSS',
-                    'theme.savedThemes': 'Saved Themes',
                     'theme.default': 'Default',
+                    'theme.light': 'Light',
                     'theme.dark': 'Dark',
                     'theme.blue': 'Ocean',
                     'theme.ocean': 'Ocean',
@@ -2500,6 +2685,11 @@ body {
                     'theme.inputBg': 'Input Background',
                     'theme.textSecondary': 'Secondary Text',
                     'theme.primaryHover': 'Primary Hover',
+                    'theme.bubbleText': 'Bubble Text',
+                    'theme.userBubbleText': 'User Bubble Text',
+                    'theme.bubbleOpacity': 'Bubble Opacity',
+                    'theme.speakingColor': 'Speaking Color',
+                    'theme.starColor': 'Asterisk Color',
                     'theme.format': 'Format',
                     'theme.minify': 'Minify',
                     'theme.preview': 'Preview',
@@ -2564,6 +2754,12 @@ body {
                     'preferences.behavior': 'User Behavior',
                     'preferences.autoAnnounce': 'Auto-send user description',
                     'preferences.showTyping': 'Show typing indicator',
+                    'preferences.layout': 'Interface Layout',
+                    'preferences.chatWidth': 'Chat Width',
+                    'preferences.developer': 'Developer Mode',
+                    'preferences.showPrompts': 'Show Full Prompts in Console',
+                    'preferences.showWorldbookLogs': 'Show World Book Logs',
+                    'preferences.showOtherLogs': 'Show Other Logs',
                     'preferences.save': 'Save Settings',
 
                     // Summarize Chat
@@ -2782,7 +2978,7 @@ body {
 
                     request.onsuccess = () => {
                         this.db = request.result;
-                        console.log('IndexedDB 初始化成功');
+                        devLogs.other('IndexedDB 初始化成功');
                         resolve(this.db);
                     };
 
@@ -2930,22 +3126,52 @@ body {
         // 创建全局 IndexedDB 存储实例
         const idbStorage = new IndexedDBStorage();
 
+        // 开发者日志控制对象
+        const devLogs = {
+            showPrompts: false,
+            showWorldbookLogs: false,
+            showOtherLogs: false,
+            
+            async load() {
+                this.showPrompts = (await idbStorage.getItem('dev_show_prompts')) === 'true';
+                this.showWorldbookLogs = (await idbStorage.getItem('dev_show_worldbook_logs')) === 'true';
+                this.showOtherLogs = (await idbStorage.getItem('dev_show_other_logs')) === 'true';
+            },
+            
+            async save() {
+                await idbStorage.setItem('dev_show_prompts', String(this.showPrompts));
+                await idbStorage.setItem('dev_show_worldbook_logs', String(this.showWorldbookLogs));
+                await idbStorage.setItem('dev_show_other_logs', String(this.showOtherLogs));
+            },
+            
+            // 条件日志输出方法
+            other(...args) {
+                if (this.showOtherLogs) console.log(...args);
+            },
+            worldbook(...args) {
+                if (this.showWorldbookLogs) console.log(...args);
+            },
+            prompt(...args) {
+                if (this.showPrompts) console.log(...args);
+            }
+        };
+
         // 全局聊天历史记录数组
         let chatHistory = []; // Array of { role: 'user'/'assistant', content: '...' }
 
         document.addEventListener('DOMContentLoaded', async () => {
             // 等待 IndexedDB 初始化完成
             await idbStorage.initPromise;
-            console.log('IndexedDB 已就绪');
+            devLogs.other('IndexedDB 已就绪');
 
             // 检查是否需要从 localStorage 迁移数据
             const hasMigrated = await idbStorage.getItem('_migration_completed');
             if (!hasMigrated && localStorage.length > 0) {
-                console.log('[初始化] 检测到 localStorage 数据，开始迁移...');
+                devLogs.other('[初始化] 检测到 localStorage 数据，开始迁移...');
                 const result = await idbStorage.migrateFromLocalStorage();
                 if (result.success) {
                     await idbStorage.setItem('_migration_completed', 'true');
-                    console.log('[初始化] 数据迁移完成');
+                    devLogs.other('[初始化] 数据迁移完成');
 
                     // 显示迁移统计
                     const stats = await idbStorage.getStorageStats();
@@ -2971,7 +3197,7 @@ body {
             function triggerAutoSave() {
                 clearTimeout(saveTimeout);
                 saveTimeout = setTimeout(() => {
-                    console.log('[自动保存] 正在保存数据...');
+                    devLogs.other('[自动保存] 正在保存数据...');
                     showSaveToast('已自动保存');
                 }, 1000); // 1秒后保存
             }
@@ -3318,7 +3544,7 @@ body {
 
                         if (isDebug) {
                              const allModelIds = models.map(m => m.id).sort();
-                             const debugHtml = `<details class="text-left"><summary>发现 ${allModelIds.length} 个模型</summary><pre class="bg-gray-100 p-2 rounded-md max-h-40 overflow-y-auto text-xs">${JSON.stringify(allModelIds, null, 2)}</pre></details>`;
+                             const debugHtml = `<details class="text-left"><summary>发现 ${allModelIds.length} 个模型</summary><pre class="theme-info-bg p-2 rounded-md max-h-40 overflow-y-auto text-xs">${JSON.stringify(allModelIds, null, 2)}</pre></details>`;
                              showApiResult(debugHtml, 'success', resultDivId);
                         } else {
                             showApiResult(`连接成功！发现 ${models.length} 个模型`, 'success', resultDivId);
@@ -3590,8 +3816,9 @@ body {
 
                 Object.keys(presets).forEach(name => {
                     const item = document.createElement('div');
-                    item.className = 'preset-item p-2 rounded-md cursor-pointer hover:bg-gray-100 flex justify-between items-center';
+                    item.className = 'preset-item p-2 rounded-md cursor-pointer hover-bg flex justify-between items-center';
                     item.dataset.name = name;
+                    item.style.backgroundColor = 'var(--card-bg-color)';
 
                     item.innerHTML = `<div class="flex items-center gap-2"><i class="fas fa-grip-vertical drag-handle text-gray-400"></i><span>${name}</span></div>`;
 
@@ -3808,19 +4035,74 @@ body {
                 reader.onload = async (e) => {
                     try {
                         const importedPreset = JSON.parse(e.target.result);
-                        if (typeof importedPreset.temperature === 'undefined' && !importedPreset.prompts) { throw new Error('文件似乎不是有效的预设格式。'); }
+                        if (typeof importedPreset.temperature === 'undefined' && !importedPreset.prompts) { 
+                            throw new Error('文件似乎不是有效的预设格式。'); 
+                        }
+                        
                         const presetName = file.name.replace(/\.json$/i, '');
                         const presets = await getPresets();
+                        
+                        // 处理prompts：完全参考SillyTavern的方式
+                        let orderedPrompts = [];
+                        
+                        // 如果有prompt_order，使用它来确定顺序和enabled状态
+                        if (importedPreset.prompt_order && Array.isArray(importedPreset.prompt_order) && importedPreset.prompt_order.length > 0) {
+                            // 使用最后一个prompt_order配置（通常是最完整的配置）
+                            // 因为SillyTavern的预设可能有多个character_id的配置，最后一个通常是实际使用的
+                            const promptOrderData = importedPreset.prompt_order[importedPreset.prompt_order.length - 1];
+                            const promptOrder = promptOrderData.order || promptOrderData;
+                            
+                            // 创建一个prompt查找表（以identifier为键）
+                            const promptMap = {};
+                            if (importedPreset.prompts && Array.isArray(importedPreset.prompts)) {
+                                importedPreset.prompts.forEach(p => {
+                                    if (p.identifier) {
+                                        promptMap[p.identifier] = { ...p };
+                                    }
+                                });
+                            }
+                            
+                            // 按照prompt_order的顺序重建prompts数组
+                            if (Array.isArray(promptOrder)) {
+                                promptOrder.forEach(orderItem => {
+                                    const identifier = orderItem.identifier;
+                                    
+                                    if (promptMap[identifier]) {
+                                        // 使用prompt_order中的enabled状态覆盖prompts中的enabled状态
+                                        const finalPrompt = {
+                                            ...promptMap[identifier],
+                                            enabled: orderItem.enabled !== undefined ? orderItem.enabled : (promptMap[identifier].enabled !== undefined ? promptMap[identifier].enabled : true)
+                                        };
+                                        orderedPrompts.push(finalPrompt);
+                                    }
+                                });
+                            }
+                        } else if (importedPreset.prompts && Array.isArray(importedPreset.prompts)) {
+                            // 如果没有prompt_order，直接使用prompts数组（保持原有逻辑）
+                            orderedPrompts = importedPreset.prompts.map(p => ({
+                                ...p,
+                                enabled: p.enabled !== undefined ? p.enabled : true
+                            }));
+                        }
+                        
                         presets[presetName] = {
-                            temp: importedPreset.temperature ?? 1, top_p: importedPreset.top_p ?? 1,
-                            top_k: importedPreset.top_k ?? 50, freq_pen: importedPreset.frequency_penalty ?? 0,
-                            pres_pen: importedPreset.presence_penalty ?? 0, rep_pen: importedPreset.repetition_penalty ?? 1.1,
-                            max_tokens: importedPreset.openai_max_tokens ?? 1024, context_size: importedPreset.openai_max_context ?? 4096,
-                            prompts: importedPreset.prompts || []
+                            temp: importedPreset.temperature ?? 1, 
+                            top_p: importedPreset.top_p ?? 1,
+                            top_k: importedPreset.top_k ?? 50, 
+                            freq_pen: importedPreset.frequency_penalty ?? 0,
+                            pres_pen: importedPreset.presence_penalty ?? 0, 
+                            rep_pen: importedPreset.repetition_penalty ?? 1.1,
+                            max_tokens: importedPreset.openai_max_tokens ?? 1024, 
+                            context_size: importedPreset.openai_max_context ?? 4096,
+                            prompts: orderedPrompts
                         };
+                        
                         await savePresets(presets, presetName);
                         alert(`预设 "${presetName}" 已成功导入!`);
-                    } catch (err) { alert(`导入失败: ${err.message}`); console.error("Preset import error:", err); }
+                    } catch (err) { 
+                        alert(`导入失败: ${err.message}`); 
+                        console.error("Preset import error:", err); 
+                    }
                     finally { event.target.value = ''; }
                 };
                 reader.onerror = () => { alert('读取文件时出错。'); event.target.value = ''; };
@@ -3884,9 +4166,9 @@ body {
             }
             async function saveCharacters() {
                 try {
-                    console.log('[保存角色] 保存角色数据:', Object.keys(char.data).length, '个角色');
+                    devLogs.other('[保存角色] 保存角色数据:', Object.keys(char.data).length, '个角色');
                     const dataStr = JSON.stringify(char.data);
-                    console.log('[保存角色] 数据大小:', (dataStr.length / 1024).toFixed(2), 'KB');
+                    devLogs.other('[保存角色] 数据大小:', (dataStr.length / 1024).toFixed(2), 'KB');
 
                     await idbStorage.setItem('characters_v2', dataStr);
 
@@ -3894,7 +4176,7 @@ body {
                     const saved = await idbStorage.getItem('characters_v2');
                     if (saved) {
                         const parsed = JSON.parse(saved);
-                        console.log('[保存角色] ✓ 验证成功: IndexedDB中有', Object.keys(parsed).length, '个角色');
+                        devLogs.other('[保存角色] ✓ 验证成功: IndexedDB中有', Object.keys(parsed).length, '个角色');
                     } else {
                         console.error('[保存角色] ✗ 验证失败: IndexedDB中没有数据!');
                         throw new Error('保存验证失败');
@@ -3966,7 +4248,7 @@ body {
                         tagBtn.className = `px-3 py-1 rounded-full text-sm transition-all ${
                             filterTags.includes(tag)
                                 ? 'bg-primary-color text-white'
-                                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                                : 'bg-gray-200 theme-text hover:bg-gray-300'
                         }`;
                         tagBtn.textContent = tag;
                         tagBtn.addEventListener('click', () => {
@@ -4015,7 +4297,9 @@ body {
                     if (character.id === char.activeCharacterId) {
                         item.className += ' border-primary-color bg-primary-color bg-opacity-10';
                     } else {
-                        item.className += ' border-gray-200 hover:border-primary-color hover:bg-gray-50';
+                        item.className += ' hover-border hover-bg';
+                        item.style.backgroundColor = 'var(--card-bg-color)';
+                        item.style.borderColor = 'var(--border-color)';
                     }
 
                     item.innerHTML = `
@@ -4147,7 +4431,9 @@ body {
 
                 greetings.forEach((greeting, index) => {
                     const item = document.createElement('div');
-                    item.className = 'p-3 border border-gray-200 rounded-lg hover:bg-gray-50 flex items-start gap-2';
+                    item.className = 'p-3 border rounded-lg hover-bg flex items-start gap-2';
+                    item.style.backgroundColor = 'var(--card-bg-color)';
+                    item.style.borderColor = 'var(--border-color)';
 
                     const badge = document.createElement('div');
                     badge.className = 'flex-shrink-0 w-6 h-6 bg-primary-color text-white rounded-full flex items-center justify-center text-xs font-bold';
@@ -4157,7 +4443,7 @@ body {
                     content.className = 'flex-1 min-w-0';
                     const preview = greeting.length > 100 ? greeting.substring(0, 100) + '...' : greeting;
                     const textNode = document.createElement('p');
-                    textNode.className = 'text-sm text-gray-700 break-words';
+                    textNode.className = 'text-sm theme-text break-words';
                     textNode.textContent = preview;
                     content.appendChild(textNode);
 
@@ -4744,8 +5030,8 @@ body {
 
             async function loadCharacters() {
                 char.data = await getCharacters();
-                console.log('[加载角色] 从IndexedDB加载了', Object.keys(char.data).length, '个角色');
-                console.log('[加载角色] 角色列表:', Object.values(char.data).map(c => c.name));
+                devLogs.other('[加载角色] 从 IndexedDB 加载了', Object.keys(char.data).length, '个角色');
+                devLogs.other('[加载角色] 角色列表:', Object.keys(char.data));
 
                 char.activeCharacterId = await idbStorage.getItem('active_character_v2');
                 renderCharacterSelect();
@@ -4871,8 +5157,10 @@ body {
 
                 entries.forEach(entry => {
                     const item = document.createElement('div');
-                    item.className = 'wi-entry-item p-2.5 rounded-lg cursor-pointer hover:bg-gray-100 border border-gray-200 transition-colors';
+                    item.className = 'wi-entry-item p-2.5 rounded-lg cursor-pointer hover-bg border transition-colors';
                     item.dataset.id = entry.id;
+                    item.style.backgroundColor = 'var(--card-bg-color)';
+                    item.style.borderColor = 'var(--border-color)';
                     item.innerHTML = `
                         <div class="flex items-start justify-between gap-2">
                             <div class="flex-1 min-w-0">
@@ -5220,7 +5508,39 @@ body {
 
             async function getRegexData() {
                 const globalDataStr = await idbStorage.getItem('global_regex_v1');
-                const globalData = globalDataStr ? JSON.parse(globalDataStr) : [];
+                let globalData = globalDataStr ? JSON.parse(globalDataStr) : [];
+                
+                // 检查并添加默认的regex脚本
+                const defaultScripts = [
+                    {
+                        id: 'default-speaking-color',
+                        scriptName: 'Speaking Color',
+                        findRegex: '(“[\\s\\S]*?”|"[\\s\\S]*?")',
+                        replaceString: '^^^<span class="speaking-color">$1</span>^^^',
+                        disabled: false
+                    },
+                    {
+                        id: 'default-star-color',
+                        scriptName: 'Star Color',
+                        findRegex: '\\*([\\s\\S]*?)\\*',
+                        replaceString: '^^^<span class="star-color">$1</span>^^^',
+                        disabled: false
+                    }
+                ];
+                
+                // 检查每个默认脚本是否已存在
+                defaultScripts.forEach(defaultScript => {
+                    const exists = globalData.some(script => script.scriptName === defaultScript.scriptName);
+                    if (!exists) {
+                        globalData.push(defaultScript);
+                    }
+                });
+                
+                // 如果添加了新脚本，保存到存储
+                if (globalData.length > (globalDataStr ? JSON.parse(globalDataStr).length : 0)) {
+                    await idbStorage.setItem('global_regex_v1', JSON.stringify(globalData));
+                }
+                
                 return { global: globalData };
             }
 
@@ -5509,10 +5829,8 @@ body {
                         }
                     }
 
-                    // 构建预览HTML
-                    const roleColor = msg.role === 'system' ? 'bg-blue-50 border-blue-300' :
-                                     msg.role === 'user' ? 'bg-green-50 border-green-300' :
-                                     'bg-purple-50 border-purple-300';
+                    // 构建预览HTML - 使用主题变量
+                    const roleColor = 'theme-info-bg';
 
                     const roleIcon = msg.role === 'system' ? 'fa-cog' :
                                     msg.role === 'user' ? 'fa-user' :
@@ -5523,15 +5841,15 @@ body {
                                      'AI助手';
 
                     html += `
-                        <div class="border rounded-lg p-4 ${roleColor}">
+                        <div class="border rounded-lg p-4 ${roleColor} theme-border">
                             <div class="flex justify-between items-center mb-2">
                                 <div class="flex items-center gap-2">
                                     <i class="fas ${roleIcon}"></i>
                                     <span class="font-bold">${roleLabel}</span>
                                 </div>
-                                <span class="text-sm text-gray-600">${tokens} tokens</span>
+                                <span class="text-sm theme-text-secondary">${tokens} tokens</span>
                             </div>
-                            <div class="text-sm whitespace-pre-wrap font-mono bg-white p-3 rounded border">${escapeHtml(msg.content)}</div>
+                            <div class="text-sm whitespace-pre-wrap font-mono p-3 rounded border" style="background-color: var(--input-bg-color);">${escapeHtml(msg.content)}</div>
                         </div>
                     `;
                 });
@@ -5665,7 +5983,9 @@ body {
 
                 greetings.forEach((greeting, index) => {
                     const item = document.createElement('div');
-                    item.className = 'p-4 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors';
+                    item.className = 'p-4 border rounded-lg hover-bg cursor-pointer transition-colors';
+                    item.style.backgroundColor = 'var(--card-bg-color)';
+                    item.style.borderColor = 'var(--border-color)';
 
                     // 应用regex转换后获取预览
                     const processedGreeting = applyRegex(greeting);
@@ -5686,7 +6006,7 @@ body {
                     titleDiv.textContent = `开场白 ${index + 1}`;
 
                     const previewDiv = document.createElement('div');
-                    previewDiv.className = 'text-sm text-gray-600 break-words';
+                    previewDiv.className = 'text-sm theme-text-secondary break-words';
                     previewDiv.style.maxHeight = '200px';
                     previewDiv.style.overflow = 'hidden';
                     previewDiv.style.overflowWrap = 'break-word';
@@ -5894,6 +6214,34 @@ body {
                 }
             }
 
+            // 状态栏解析和渲染函数
+            function parseStatBar(text) {
+                // 匹配三引号包裹的内容: ```...```
+                const statBarRegex = /```\s*\n?([\s\S]*?)\n?```/g;
+                
+                return text.replace(statBarRegex, (match, content) => {
+                    const trimmedContent = content.trim();
+                    if (!trimmedContent) {
+                        return match;
+                    }
+                    
+                    // 如果内容包含HTML标签格式（<...>或</...>），不处理为状态栏
+                    if (/<[^>]+>/.test(trimmedContent)) {
+                        return match;
+                    }
+                    
+                    return renderStatBar(trimmedContent);
+                });
+            }
+            
+            // 渲染状态栏
+            function renderStatBar(content) {
+                // 高亮数字、英文字母和特殊符号（∞/+%）
+                const highlightedContent = content.replace(/([a-zA-Z0-9∞/+%]+)/g, '<span class="stat-non-chinese">$1</span>');
+                
+                return `<div class="stat-bar-container">${highlightedContent}</div>`;
+            }
+
             function applyRegex(text) {
                 let processedText = text;
                 const allScripts = [
@@ -6033,7 +6381,18 @@ body {
                     // 只对AI消息应用regex
                     if (!isUser) {
                         finalContent = applyRegex(content);
+                        // 替换{{user}}为当前用户名
+                        const currentUserName = userManagement.getCurrentUser()?.name || '用户';
+                        finalContent = finalContent.replace(/\{\{user\}\}/gi, currentUserName);
                     }
+                    
+                    // 处理^^^包裹的HTML内容（对所有消息都应用）
+                    finalContent = finalContent.replace(/\^\^\^([\s\S]*?)\^\^\^/g, function(match, htmlContent) {
+                        return htmlContent;
+                    });
+                    
+                    // 解析状态栏 (对所有消息都应用)
+                    finalContent = parseStatBar(finalContent);
 
                     const contentDiv = document.createElement('div');
                     contentDiv.className = 'message-content text-left whitespace-pre-wrap';
@@ -6645,8 +7004,18 @@ body {
                             }
                         }
                     } else {
-                        // 否则使用textContent保持纯文本,保留换行
-                        contentDiv.textContent = finalContent;
+                        // 检查是否包含状态栏HTML
+                        if (finalContent.includes('stat-bar-container')) {
+                            // 包含状态栏,使用innerHTML渲染,但保留换行
+                            const contentWithBreaks = finalContent
+                                .replace(/\r\n/g, '<br>')
+                                .replace(/\r/g, '<br>')
+                                .replace(/\n/g, '<br>');
+                            contentDiv.innerHTML = contentWithBreaks;
+                        } else {
+                            // 否则使用textContent保持纯文本,保留换行
+                            contentDiv.textContent = finalContent;
+                        }
                         messageBubble.appendChild(contentDiv);
                     }
                 } else if (type === 'image') {
@@ -6909,7 +7278,7 @@ body {
                 }
 
                 // 收集角色世界书
-                console.log('[世界书] 检查角色世界书:', {
+                devLogs.worldbook('[世界书] 检查角色世界书:', {
                     hasCharacter: !!character,
                     hasCharacterBook: !!character?.data?.character_book,
                     hasEntries: !!character?.data?.character_book?.entries,
@@ -6917,10 +7286,10 @@ body {
                 });
 
                 if (character?.data?.character_book?.entries) {
-                    console.log('[世界书] 角色世界书条目:', character.data.character_book.entries);
+                    devLogs.worldbook('[世界书] 角色世界书条目:', character.data.character_book.entries);
 
                     character.data.character_book.entries.forEach((entry, index) => {
-                        console.log(`[世界书] 处理条目 ${index}:`, {
+                        devLogs.worldbook(`[世界书] 处理条目 ${index}:`, {
                             enabled: entry.enabled,
                             constant: entry.constant,
                             keys: entry.keys,
@@ -6938,7 +7307,7 @@ body {
 
                                 for (const key of keys) {
                                     if (key && allContext.toLowerCase().includes(key.toLowerCase())) {
-                                        console.log(`[世界书] 条目 ${index} 匹配关键词: ${key}`);
+                                        devLogs.worldbook(`[世界书] 条目 ${index} 匹配关键词: ${key}`);
                                         shouldInclude = true;
                                         break;
                                     }
@@ -6946,10 +7315,10 @@ body {
                             }
 
                             if (shouldInclude && entry.content) {
-                                console.log(`[世界书] 添加条目 ${index} 到提示词`);
+                                devLogs.worldbook(`[世界书] 添加条目 ${index} 到提示词`);
                                 worldInfoContent.push(entry.content);
                             } else {
-                                console.log(`[世界书] 跳过条目 ${index} (shouldInclude: ${shouldInclude}, hasContent: ${!!entry.content})`);
+                                devLogs.worldbook(`[世界书] 跳过条目 ${index} (shouldInclude: ${shouldInclude}, hasContent: ${!!entry.content})`);
                             }
                         }
                     });
@@ -6957,10 +7326,10 @@ body {
 
                 // 5. 组合系统提示词
                 if (worldInfoContent.length > 0) {
-                    console.log('[世界书] 添加到系统提示词，总计条目数:', worldInfoContent.length);
+                    devLogs.worldbook('[世界书] 添加到系统提示词，总计条目数:', worldInfoContent.length);
                     systemPromptParts.push('\nWorld Information:\n' + worldInfoContent.join('\n'));
                 } else {
-                    console.log('[世界书] 没有世界书条目被添加');
+                    devLogs.worldbook('[世界书] 没有世界书条目被添加');
                 }
 
                 if (systemPromptParts.length > 0) {
@@ -7023,6 +7392,18 @@ body {
 
                 const messages = await constructFinalPrompt();
                 if (messages.length === 0) return;
+                
+                // 显示完整提示词到控制台（如果开启）
+                if (devLogs.showPrompts) {
+                    console.groupCollapsed(`📝 完整提示词 (${messages.length} 条消息)`);
+                    messages.forEach((msg, index) => {
+                        const roleEmoji = msg.role === 'system' ? '⚙️' : msg.role === 'user' ? '👤' : '🤖';
+                        console.groupCollapsed(`${roleEmoji} [${index + 1}] ${msg.role}`);
+                        console.log(msg.content);
+                        console.groupEnd();
+                    });
+                    console.groupEnd();
+                }
 
                 sendButton.disabled = true;
                 sendButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
@@ -7144,6 +7525,12 @@ body {
                             // 重新渲染应用regex后的消息
                             renderMessage(aiMessage);
                             chatMessages.scrollTop = chatMessages.scrollHeight;
+                        }
+
+                        // 保存聊天记录
+                        if (char.activeCharacterId) {
+                            await idbStorage.setItem(`chat_history_${char.activeCharacterId}`, JSON.stringify(chatHistory));
+                            triggerAutoSave();
                         }
 
                     } else {
@@ -7848,6 +8235,10 @@ You must structure your entire output strictly in the following format, without 
                     await this.loadUsers();
                     this.bindEvents();
                     this.renderUserList();
+                    // 自动加载当前用户到编辑器
+                    if (this.currentUserId) {
+                        this.selectUser(this.currentUserId);
+                    }
                 },
 
                 async loadUsers() {
@@ -7899,7 +8290,9 @@ You must structure your entire output strictly in the following format, without 
                         if (user.id === this.currentUserId) {
                             item.className += ' border-primary-color bg-primary-color bg-opacity-10';
                         } else {
-                            item.className += ' border-gray-200 hover:border-primary-color hover:bg-gray-50';
+                            item.className += ' hover-border hover-bg';
+                            item.style.backgroundColor = 'var(--card-bg-color)';
+                            item.style.borderColor = 'var(--border-color)';
                         }
 
                         item.innerHTML = `
@@ -8191,7 +8584,7 @@ You must structure your entire output strictly in the following format, without 
 
             // --- Preferences Logic ---
             const preferencesManager = {
-                init() {
+                async init() {
                     const savePreferencesBtn = document.getElementById('save-preferences-btn');
                     if (savePreferencesBtn) {
                         savePreferencesBtn.addEventListener('click', () => this.savePreferences());
@@ -8215,15 +8608,32 @@ You must structure your entire output strictly in the following format, without 
                         });
                     }
 
+                    // Initialize chat width slider
+                    const chatWidthSlider = document.getElementById('chat-width-slider');
+                    const chatWidthValue = document.getElementById('chat-width-value');
+                    if (chatWidthSlider && chatWidthValue) {
+                        chatWidthSlider.addEventListener('input', (e) => {
+                            const value = e.target.value;
+                            chatWidthValue.textContent = value + '%';
+                            this.applyChatWidth(value);
+                        });
+                    }
+
                     // Load preferences when modal opens
                     const navButtons = document.querySelectorAll('[data-modal="preferences-modal"]');
                     navButtons.forEach(btn => {
                         btn.addEventListener('click', () => this.loadPreferences());
                     });
+
+                    // Load saved chat width on page load
+                    await this.loadChatWidth();
+                    
+                    // Load developer mode settings
+                    await devLogs.load();
                 },
 
-                loadPreferences() {
-                    const currentUser = userManager.getCurrentUser();
+                async loadPreferences() {
+                    const currentUser = userManagement.getCurrentUser();
                     if (!currentUser) return;
 
                     // Load language
@@ -8235,10 +8645,24 @@ You must structure your entire output strictly in the following format, without 
                     // Load user behavior settings
                     document.getElementById('user-auto-announce-pref').checked = currentUser.autoAnnounce || false;
                     document.getElementById('user-show-typing-pref').checked = currentUser.showTyping !== false;
+
+                    // Load chat width
+                    const chatWidth = await idbStorage.getItem('chat_width') || '60';
+                    const chatWidthSlider = document.getElementById('chat-width-slider');
+                    const chatWidthValue = document.getElementById('chat-width-value');
+                    if (chatWidthSlider && chatWidthValue) {
+                        chatWidthSlider.value = chatWidth;
+                        chatWidthValue.textContent = chatWidth + '%';
+                    }
+                    
+                    // Load developer mode settings
+                    document.getElementById('dev-show-prompts').checked = devLogs.showPrompts;
+                    document.getElementById('dev-show-worldbook-logs').checked = devLogs.showWorldbookLogs;
+                    document.getElementById('dev-show-other-logs').checked = devLogs.showOtherLogs;
                 },
 
-                savePreferences() {
-                    const currentUser = userManager.getCurrentUser();
+                async savePreferences() {
+                    const currentUser = userManagement.getCurrentUser();
                     if (!currentUser) {
                         alert('请先选择一个用户！');
                         return;
@@ -8258,8 +8682,29 @@ You must structure your entire output strictly in the following format, without 
                     document.getElementById('user-auto-announce').checked = currentUser.autoAnnounce;
                     document.getElementById('user-show-typing').checked = currentUser.showTyping;
 
-                    userManager.saveUsers();
+                    // Save chat width
+                    const chatWidthSlider = document.getElementById('chat-width-slider');
+                    if (chatWidthSlider) {
+                        await idbStorage.setItem('chat_width', chatWidthSlider.value);
+                    }
+                    
+                    // Save developer mode settings
+                    devLogs.showPrompts = document.getElementById('dev-show-prompts').checked;
+                    devLogs.showWorldbookLogs = document.getElementById('dev-show-worldbook-logs').checked;
+                    devLogs.showOtherLogs = document.getElementById('dev-show-other-logs').checked;
+                    await devLogs.save();
+
+                    userManagement.saveUsers();
                     alert('偏好设置已保存！');
+                },
+
+                async loadChatWidth() {
+                    const chatWidth = await idbStorage.getItem('chat_width') || '60';
+                    this.applyChatWidth(chatWidth);
+                },
+
+                applyChatWidth(width) {
+                    document.documentElement.style.setProperty('--chat-width', width + '%');
                 }
             };
 
@@ -8270,6 +8715,23 @@ You must structure your entire output strictly in the following format, without 
                 customCss: '',
                 defaultPresets: {
                     default: {
+                        primaryColor: '#ff8c00',
+                        bgColor: '#1a1a1d',
+                        userBubbleColor: '#ff8c00',
+                        aiBubbleColor: '#2d2d30',
+                        cardBgColor: '#2d2d30',
+                        textColor: '#ffffff',
+                        borderColor: '#404040',
+                        inputBgColor: '#404040',
+                        textSecondaryColor: '#ffffff',
+                        primaryHoverColor: '#ffbf33',
+                        bubbleTextColor: '#ffffff',
+                        userBubbleTextColor: '#ffffff',
+                        bubbleOpacity: '0.95',
+                        speakingColor: '#ffb347',
+                        starColor: '#b0b0b0'
+                    },
+                    light: {
                         primaryColor: '#5E5B9D',
                         bgColor: '#f0f2f5',
                         userBubbleColor: '#5E5B9D',
@@ -8277,7 +8739,11 @@ You must structure your entire output strictly in the following format, without 
                         cardBgColor: '#ffffff',
                         textColor: '#1a1a1d',
                         borderColor: '#dcdfe3',
-                        inputBgColor: '#e4e6eb'
+                        inputBgColor: '#e4e6eb',
+                        bubbleTextColor: '#1a1a1d',
+                        userBubbleTextColor: '#FFFFFF',
+                        speakingColor: '#ff8c42',
+                        starColor: '#8e8e93'
                     },
                     dark: {
                         primaryColor: '#7875b3',
@@ -8287,7 +8753,11 @@ You must structure your entire output strictly in the following format, without 
                         cardBgColor: '#2d2d30',
                         textColor: '#e0e0e0',
                         borderColor: '#404040',
-                        inputBgColor: '#404040'
+                        inputBgColor: '#404040',
+                        bubbleTextColor: '#e0e0e0',
+                        userBubbleTextColor: '#FFFFFF',
+                        speakingColor: '#ffa366',
+                        starColor: '#a0a0a0'
                     },
                     blue: {
                         primaryColor: '#3498db',
@@ -8297,7 +8767,11 @@ You must structure your entire output strictly in the following format, without 
                         cardBgColor: '#ffffff',
                         textColor: '#2c3e50',
                         borderColor: '#bdc3c7',
-                        inputBgColor: '#d5dbdb'
+                        inputBgColor: '#d5dbdb',
+                        bubbleTextColor: '#2c3e50',
+                        userBubbleTextColor: '#FFFFFF',
+                        speakingColor: '#3498db',
+                        starColor: '#7f8c8d'
                     },
                     green: {
                         primaryColor: '#27ae60',
@@ -8307,7 +8781,11 @@ You must structure your entire output strictly in the following format, without 
                         cardBgColor: '#ffffff',
                         textColor: '#27ae60',
                         borderColor: '#a9dfbf',
-                        inputBgColor: '#d5f4e6'
+                        inputBgColor: '#d5f4e6',
+                        bubbleTextColor: '#1a5a2e',
+                        userBubbleTextColor: '#FFFFFF',
+                        speakingColor: '#27ae60',
+                        starColor: '#95a5a6'
                     },
                     purple: {
                         primaryColor: '#8e44ad',
@@ -8317,7 +8795,11 @@ You must structure your entire output strictly in the following format, without 
                         cardBgColor: '#ffffff',
                         textColor: '#6c3483',
                         borderColor: '#d2b4de',
-                        inputBgColor: '#ebdef0'
+                        inputBgColor: '#ebdef0',
+                        bubbleTextColor: '#4a235a',
+                        userBubbleTextColor: '#FFFFFF',
+                        speakingColor: '#e74c3c',
+                        starColor: '#a569bd'
                     },
                     pink: {
                         primaryColor: '#e91e63',
@@ -8327,14 +8809,18 @@ You must structure your entire output strictly in the following format, without 
                         cardBgColor: '#ffffff',
                         textColor: '#880e4f',
                         borderColor: '#f8bbd0',
-                        inputBgColor: '#f5d0db'
+                        inputBgColor: '#f5d0db',
+                        bubbleTextColor: '#880e4f',
+                        userBubbleTextColor: '#FFFFFF',
+                        speakingColor: '#ff6b9d',
+                        starColor: '#c2185b'
                     }
                 },
 
-                init() {
-                    this.loadThemes();
+                async init() {
+                    await this.loadThemes();
                     this.bindEvents();
-                    this.loadCustomCss();
+                    await this.loadCustomCss();
                     this.renderSavedThemes();
                     this.applyCurrentTheme();
                     this.initColorInputs();
@@ -8385,7 +8871,14 @@ You must structure your entire output strictly in the following format, without 
                         cardBgColor: computedStyle.getPropertyValue('--card-bg-color').trim() || '#ffffff',
                         textColor: computedStyle.getPropertyValue('--text-color').trim() || '#1a1a1d',
                         borderColor: computedStyle.getPropertyValue('--border-color').trim() || '#dcdfe3',
-                        inputBgColor: computedStyle.getPropertyValue('--input-bg-color').trim() || '#e4e6eb'
+                        inputBgColor: computedStyle.getPropertyValue('--input-bg-color').trim() || '#e4e6eb',
+                        textSecondaryColor: computedStyle.getPropertyValue('--text-secondary-color').trim() || '#65676b',
+                        primaryHoverColor: computedStyle.getPropertyValue('--primary-hover-color').trim() || '#7875b3',
+                        bubbleTextColor: computedStyle.getPropertyValue('--bubble-text-color').trim() || '#1a1a1d',
+                        userBubbleTextColor: computedStyle.getPropertyValue('--user-bubble-text-color').trim() || '#FFFFFF',
+                        bubbleOpacity: computedStyle.getPropertyValue('--bubble-opacity').trim() || '0.95',
+                        speakingColor: computedStyle.getPropertyValue('--speaking-color').trim() || '#ff8c42',
+                        starColor: computedStyle.getPropertyValue('--star-color').trim() || '#8e8e93'
                     };
                 },
 
@@ -8400,10 +8893,21 @@ You must structure your entire output strictly in the following format, without 
                     if (themeData.textColor) root.style.setProperty('--text-color', themeData.textColor);
                     if (themeData.borderColor) root.style.setProperty('--border-color', themeData.borderColor);
                     if (themeData.inputBgColor) root.style.setProperty('--input-bg-color', themeData.inputBgColor);
+                    if (themeData.textSecondaryColor) root.style.setProperty('--text-secondary-color', themeData.textSecondaryColor);
+                    if (themeData.primaryHoverColor) root.style.setProperty('--primary-hover-color', themeData.primaryHoverColor);
+                    if (themeData.bubbleTextColor) root.style.setProperty('--bubble-text-color', themeData.bubbleTextColor);
+                    if (themeData.userBubbleTextColor) root.style.setProperty('--user-bubble-text-color', themeData.userBubbleTextColor);
+                    if (themeData.bubbleOpacity !== undefined) root.style.setProperty('--bubble-opacity', themeData.bubbleOpacity);
+                    if (themeData.speakingColor) root.style.setProperty('--speaking-color', themeData.speakingColor);
+                    if (themeData.starColor) root.style.setProperty('--star-color', themeData.starColor);
 
-                    // 计算衍生颜色
-                    root.style.setProperty('--primary-hover-color', this.adjustBrightness(themeData.primaryColor || '#5E5B9D', 20));
-                    root.style.setProperty('--text-secondary-color', this.adjustBrightness(themeData.textColor || '#1a1a1d', 40));
+                    // 如果没有提供这些颜色，则自动计算衍生颜色
+                    if (!themeData.primaryHoverColor && themeData.primaryColor) {
+                        root.style.setProperty('--primary-hover-color', this.adjustBrightness(themeData.primaryColor, 20));
+                    }
+                    if (!themeData.textSecondaryColor && themeData.textColor) {
+                        root.style.setProperty('--text-secondary-color', this.adjustBrightness(themeData.textColor, 40));
+                    }
 
                     if (themeData.customCss) {
                         this.saveCustomCss(themeData.customCss);
@@ -8420,6 +8924,24 @@ You must structure your entire output strictly in the following format, without 
                     // 然后检查是否是预设主题
                     else if (this.defaultPresets[this.currentTheme]) {
                         this.applyTheme(this.defaultPresets[this.currentTheme]);
+                    }
+                    
+                    // 更新预设主题按钮的激活状态
+                    this.updatePresetButtonStates();
+                },
+                
+                updatePresetButtonStates() {
+                    // 移除所有按钮的激活状态
+                    document.querySelectorAll('.theme-preset-btn').forEach(btn => {
+                        btn.classList.remove('active');
+                    });
+                    
+                    // 如果当前主题是预设主题之一，高亮对应按钮
+                    if (this.defaultPresets[this.currentTheme]) {
+                        const activeBtn = document.querySelector(`.theme-preset-btn[data-theme="${this.currentTheme}"]`);
+                        if (activeBtn) {
+                            activeBtn.classList.add('active');
+                        }
                     }
                 },
 
@@ -8541,7 +9063,8 @@ You must structure your entire output strictly in the following format, without 
                         themeNames.forEach(name => {
                             const theme = this.themes[name];
                             const item = document.createElement('div');
-                            item.className = 'theme-item p-3 rounded-lg border border-gray-200 hover:border-primary-color cursor-pointer';
+                            item.className = 'theme-item p-3 rounded-lg border hover:border-primary-color cursor-pointer';
+                            item.style.borderColor = 'var(--border-color)';
 
                             if (name === this.currentTheme) {
                                 item.classList.add('border-primary-color', 'bg-primary-color', 'bg-opacity-10');
@@ -8638,7 +9161,13 @@ You must structure your entire output strictly in the following format, without 
                         { color: 'cardBgColor', text: 'cardBgColorText' },
                         { color: 'textColor', text: 'textColorText' },
                         { color: 'borderColor', text: 'borderColorText' },
-                        { color: 'inputBgColor', text: 'inputBgColorText' }
+                        { color: 'inputBgColor', text: 'inputBgColorText' },
+                        { color: 'textSecondaryColor', text: 'textSecondaryColorText' },
+                        { color: 'primaryHoverColor', text: 'primaryHoverColorText' },
+                        { color: 'bubbleTextColor', text: 'bubbleTextColorText' },
+                        { color: 'userBubbleTextColor', text: 'userBubbleTextColorText' },
+                        { color: 'speakingColor', text: 'speakingColorText' },
+                        { color: 'starColor', text: 'starColorText' }
                     ];
 
                     colorInputs.forEach(({ color, text }) => {
@@ -8658,6 +9187,21 @@ You must structure your entire output strictly in the following format, without 
                             });
                         }
                     });
+                    
+                    // 气泡不透明度滑块
+                    const opacityInput = document.getElementById('bubbleOpacityInput');
+                    const opacityText = document.getElementById('bubbleOpacityText');
+                    if (opacityInput && opacityText) {
+                        opacityInput.addEventListener('input', (e) => {
+                            opacityText.value = e.target.value;
+                        });
+                        opacityText.addEventListener('input', (e) => {
+                            const val = parseFloat(e.target.value);
+                            if (!isNaN(val) && val >= 0 && val <= 1) {
+                                opacityInput.value = val;
+                            }
+                        });
+                    }
 
                     this.updateColorInputs();
                 },
@@ -8666,11 +9210,17 @@ You must structure your entire output strictly in the following format, without 
                     const colors = this.getCurrentThemeColors();
 
                     Object.entries(colors).forEach(([key, value]) => {
-                        const colorInput = document.getElementById(`${key}Input`);
-                        const textInput = document.getElementById(`${key}Text`);
-
-                        if (colorInput) colorInput.value = value;
-                        if (textInput) textInput.value = value;
+                        if (key === 'bubbleOpacity') {
+                            const opacityInput = document.getElementById('bubbleOpacityInput');
+                            const opacityText = document.getElementById('bubbleOpacityText');
+                            if (opacityInput) opacityInput.value = value;
+                            if (opacityText) opacityText.value = value;
+                        } else {
+                            const colorInput = document.getElementById(`${key}Input`);
+                            const textInput = document.getElementById(`${key}Text`);
+                            if (colorInput) colorInput.value = value;
+                            if (textInput) textInput.value = value;
+                        }
                     });
                 },
 
@@ -8695,10 +9245,16 @@ You must structure your entire output strictly in the following format, without 
                     if (applyBtn) {
                         applyBtn.addEventListener('click', () => {
                             const colors = {};
-                            ['primaryColor', 'bgColor', 'userBubbleColor', 'aiBubbleColor', 'cardBgColor', 'textColor', 'borderColor', 'inputBgColor'].forEach(key => {
+                            ['primaryColor', 'bgColor', 'userBubbleColor', 'aiBubbleColor', 'cardBgColor', 'textColor', 'borderColor', 'inputBgColor', 'textSecondaryColor', 'primaryHoverColor', 'bubbleTextColor', 'userBubbleTextColor', 'speakingColor', 'starColor'].forEach(key => {
                                 const input = document.getElementById(`${key}Input`);
                                 if (input) colors[key] = input.value;
                             });
+                            
+                            // 添加不透明度
+                            const opacityInput = document.getElementById('bubbleOpacityInput');
+                            if (opacityInput) {
+                                colors.bubbleOpacity = opacityInput.value;
+                            }
 
                             this.applyTheme(colors);
 
@@ -8777,6 +9333,17 @@ You must structure your entire output strictly in the following format, without 
                     if (saveCurrentBtn) {
                         saveCurrentBtn.addEventListener('click', () => this.saveAsNewTheme());
                     }
+                    
+                    // 监听主题设置模态框打开事件，更新按钮状态
+                    const themeModalButtons = document.querySelectorAll('[data-modal="theme-settings-modal"]');
+                    themeModalButtons.forEach(btn => {
+                        btn.addEventListener('click', () => {
+                            // 延迟执行以确保模态框已打开
+                            setTimeout(() => {
+                                this.updatePresetButtonStates();
+                            }, 100);
+                        });
+                    });
                 }
             };
 
@@ -8806,14 +9373,13 @@ You must structure your entire output strictly in the following format, without 
                 }
             };
 
-            // 初始化主题管理
-            themeManager.init();
-            preferencesManager.init();
-
-
             // --- Initial Load ---
             // 异步初始化函数
             async function initializeApp() {
+                // 先初始化主题和偏好设置（需要等待IndexedDB加载）
+                await themeManager.init();
+                await preferencesManager.init();
+                
                 await userManagement.init();
                 loadApiConfigs();
                 loadPresetsList();
